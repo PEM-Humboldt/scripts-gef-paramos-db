@@ -8,10 +8,7 @@ def process_ceiba(connection, cursor, ipt_download_url_ceiba, ipt_download_url_d
 
     La función descarga un archivo ZIP desde una URL específica, lo descomprime y guarda los archivos
     en un directorio local. Si el archivo no existe, se informa al usuario.
-    Se requiere la librería dotenv para cargar las variables de entorno desde un archivo .env.
-    Se requiere la librería zipfile para manejar archivos ZIP.
     Se requiere la librería os para manejar rutas de archivos y directorios.
-    Se requiere la librería requests para manejar solicitudes HTTP.
     Se requiera la libraría shutil para borrar directorios no vacíos.
 
     Se lee desde la tabla de resources el indentificador y se revisa si el archivo corrspondiente
@@ -41,7 +38,7 @@ def process_ceiba(connection, cursor, ipt_download_url_ceiba, ipt_download_url_d
     file_url = f"{ipt_download_url_ceiba}{identifier}"   
 
     # Llamado a la función download_and_decompress_file para descargar y descomprimir el archivo ZIP retorna True o False
-    zip_exists = download_and_decompress_file(file_url, ipt_download_url_dir, identifier)
+    zip_exists = download_and_decompress_file(file_url, ipt_download_url_dir, identifier, 'ceiba')
 
     if zip_exists:
         # Define la ruta de descarga del dwca.zip

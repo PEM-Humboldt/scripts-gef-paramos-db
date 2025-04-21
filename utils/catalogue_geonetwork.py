@@ -5,8 +5,6 @@ from requests.auth import HTTPBasicAuth
 from utils.functions import update_resource
 from dotenv import load_dotenv
 
-from utils.functions import clean_text
-
 def process_geonetwork(connection, cursor, geonetwork_api_url, geonetwork_user, geonetwork_pass, identifier, resource_id):
     """Función process_geonetwork para procesar recursos desde el catalogador geonetwork.
 
@@ -14,7 +12,6 @@ def process_geonetwork(connection, cursor, geonetwork_api_url, geonetwork_user, 
     la base de datos con el título del recurso.
     en un directorio local. Si el archivo no existe, se informa al usuario.
     Se requiere la librería dotenv para cargar las variables de entorno desde un archivo .env.
-    Se requiere la librería zipfile para manejar archivos ZIP.
     Se requiere la librería os para manejar rutas de archivos y directorios.
     Se requiere la librería requests para manejar solicitudes HTTP.
 
@@ -51,9 +48,9 @@ def process_geonetwork(connection, cursor, geonetwork_api_url, geonetwork_user, 
     }
 
     try:
-        # Se contruye la URL de la API de GeoNetwork conel identificado
+        # Se contruye la URL de la API de GeoNetwork con el identificado
         url = f"{geonetwork_api_url}/{identifier}"
-        print(f"Consultado GeoNetwork API: {url} con {geonetwork_user} y {geonetwork_pass}")
+        print(f"Consultado GeoNetwork API: {url}")
         # Se hace el request a la API de GeoNetwork
         response = requests.get(url, auth=HTTPBasicAuth(geonetwork_user, geonetwork_pass), headers=headers)
         response.raise_for_status()  # Error en caso de excepción HTTP

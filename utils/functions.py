@@ -122,7 +122,7 @@ def download_and_decompress_file(file_url, download_dir, identifier, catalogue):
     # Se usa el User:agent para evitar bloqueos por error 403 por parte del servidor de Ceiba. 
     load_dotenv()
     header = None
-    headers
+    headers = None
 
     if catalogue == 'ceiba':
         header = os.getenv('USER_AGENTS')
