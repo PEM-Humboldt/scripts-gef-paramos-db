@@ -19,7 +19,7 @@ Las columnas que se deben llenar para funcionamiento son:
 * identifier: Nombre corto o identificador del recurso según el catalogador
 * catalogue: Catalogador de origen del recurso. Es un valor de 3 posibles: ceiba, geonetwork, biocultural
 
-El identificador es depedendiente de cada catalogador:
+El identificador es dependiente de cada catalogador:
 * Ceiba: Es el nombre corto del recurso. Por ejemplo, del recurso con URL https://i2d.humboldt.org.co/resource?r=rrbb_paramos_plantae_2017 es el valor después de `r=` el cual es __rrbb_paramos_plantae_2017__
 * Geonetwork: Es el UUID o identificador. Por ejemplo, del recurso con URL https://geonetwork.humboldt.org.co/geonetwork/srv/spa/catalog.search#/metadata/b1ad521f-4a2b-46ac-a644-807bf43360a7 es el valor después de /metadata/ o __b1ad521f-4a2b-46ac-a644-807bf43360a7__
 * Biocultural: Es el doi del recurso. Por ejemplo para la URL http://ec2-34-238-22-20.compute-1.amazonaws.com:8080/dataset.xhtml?persistentId=doi:10.21068/WK1KS4 es el valor después de `persistentId=` para el ejemplo __doi:10.21068/WK1KS4__ . Es importante que en el identifier quede la palabra doi:
@@ -28,7 +28,7 @@ Por lo que en la base de datos se debe crear las filas al menos con identificado
 
 ## Como ejecutar
 
-Clonar el codigo
+Clonar el código
 
 Es preferible establecer un virtual environment para ejecutar el script.
 ```
@@ -46,7 +46,7 @@ Hacer copia del archivo .env_template y dejarlo como .env
 ```
 cp .env_template .env
 ```
-Modificar los parámetros dentro del -env
+Modificar los parámetros dentro del .env
 ```
 vi .env
 ```
@@ -67,5 +67,5 @@ Un ejemplo de ejecución se encuentra dentro de la carpeta dump con la base de d
 ## Licencia
 
 Este proyecto está bajo la licencia MIT, 
-mira la [LICENCIA](licencia.md) 
+mira la [LICENCIA](https://mit-license.org/) 
 para obtener más detalles.
