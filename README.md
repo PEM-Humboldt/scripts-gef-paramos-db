@@ -61,7 +61,7 @@ Un ejemplo de ejecución se encuentra dentro de la carpeta dump con la base de d
 
 ## Problemas conocidos
 
-Cuando se ejecuta el código para consulta del API del geonetwork, se puede presentar error 400 en varios intentos de consulta. No se ha determinado la razón del error, pero se considera que es por la respuesta del API desde el geonetwork ya que hay ocasiones en donde hay respuesta al primer intento. 
+Al ejecutar el código para consultar el API de GeoNetwork, puede ocurrir un error 400 en múltiples intentos de consulta. La causa de este error no ha sido determinada con certeza, pero se presume que está relacionada con la respuesta del API, ya que en algunos casos, la solicitud es exitosa en el primer intento, devolviendo un código 200 y el cuerpo del mensaje. Se cree que el problema puede deberse a la versión instalada de GeoNetwork (3.2) en el Instituto, dado que en pruebas realizadas con versiones más recientes (3.10 y 3.12), no se han detectado errores en la consulta del API.
 
 ## Autores(as) y contacto
 
