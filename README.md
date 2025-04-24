@@ -70,6 +70,4 @@ Al ejecutar el código para consultar el API de GeoNetwork, puede ocurrir un err
 
 ## Licencia
 
-Este proyecto está bajo la licencia MIT, 
-mira la [LICENCIA](https://mit-license.org/) 
-para obtener más detalles.
+Este proyecto está bajo la licencia MIT, mira la [LICENCIA](LICENSE) para obtener más detalles.
