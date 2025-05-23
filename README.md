@@ -1,4 +1,4 @@
-# Scripts carga de datos para base GEF-P
+# Scripts carga de datos para base GEF-Paramos
 
 Script de lectura y carga de datos de catálogos ceiba y biocultural a un servidor PostgreSQL utilizando conexión a base de datos y lectura de archivos a través de descargas y API
 
