@@ -5,11 +5,10 @@ import html
 import zipfile
 import xml.etree.ElementTree as ET
 import logging
+import psycopg2
 
 import requests
 from dotenv import load_dotenv
-
-logging.basicConfig(level=logging.INFO)
 
 #  Función para limpiar texto importado desde XML
 def clean_text(text):
