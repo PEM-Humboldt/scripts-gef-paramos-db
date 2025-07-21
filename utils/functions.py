@@ -1,11 +1,15 @@
-import html
-import requests
-import zipfile
-import re
 import os
+import re
 import csv
+import html
+import zipfile
 import xml.etree.ElementTree as ET
+import logging
+
+import requests
 from dotenv import load_dotenv
+
+logging.basicConfig(level=logging.INFO)
 
 #  Función para limpiar texto importado desde XML
 def clean_text(text):
@@ -52,8 +56,7 @@ def update_resource(connection, cursor, resource_id, title_element, publication_
         cursor.execute(update_query, (title, publication_date, abstract, resource_id))
         connection.commit()
         print(f"Valores actualizados para resource_id: {resource_id}")
-    except (Exception) as error:
-    # Si se presenta error en la conexión de la base de datos, se imprime en consola.
+    except (psycopg2.DatabaseError) as error:
         print(f"Error de conexión a PostgreSQL: {error}")
         
 def read_dwca_files(file_path, table, connection, cursor, resource_id):
@@ -81,6 +84,9 @@ def read_dwca_files(file_path, table, connection, cursor, resource_id):
     event_columns = ['eventID', 'eventType', 'samplingProtocol', 'sampleSizeValue', 'sampleSizeUnit', 'samplingEffort', 'eventDate', 'habitat', 'eventRemarks', 'institutionCode', 'continent', 'country', 'countryCode', 'stateProvince', 'county', 'locality', 'minimumElevationInMeters', 'maximumElevationInMeters', 'locationRemarks', 'decimalLatitude', 'decimalLongitude', 'geodeticDatum', 'coordinateUncertaintyInMeters']
     # Selecciona las columnas de acuerdo al tipo de tabla
     selected_columns = occurrence_columns if table == 'occurrence' else event_columns  
+    if not os.path.exists(file_path):
+        print(f"El archivo {file_path} no existe.")
+        return
     with open(file_path, 'r', encoding='utf-8') as file:
         # Se lee el archivo con la librería csv y se define el delimitador de tabulación
         try:
@@ -95,8 +101,12 @@ def read_dwca_files(file_path, table, connection, cursor, resource_id):
                 columns = ', '.join([f'"{col.lower()}"' for col in filtered_row.keys()])
                 placeholders = ', '.join(['%s'] * len(filtered_row))
                 insert_query = f"INSERT INTO ceiba_" + table + f" ({columns}) VALUES ({placeholders})"
-                cursor.execute(insert_query, list(filtered_row.values()))
-                connection.commit()
+                try:
+                    cursor.execute(insert_query, list(filtered_row.values()))
+                    connection.commit()
+                except Exception as e:
+                    print(f"Error al insertar fila: {e}")
+                    continue
             print(f"filas insertadas en la tabla ceiba para resource_id: {resource_id}")
         except csv.Error as e:
             print(f"Error al leer el archivo {file_path}: {e}")
@@ -126,10 +136,14 @@ def download_and_decompress_file(file_url, download_dir, identifier, catalogue):
 
     if catalogue == 'ceiba':
         header = os.getenv('USER_AGENTS')
-        headers = {'User-Agent': header} 
+        if not header:
+            raise ValueError("USER_AGENTS no está definido en el entorno")
+        headers = {'User-Agent': header}
 
     if catalogue == 'biocultural':
         header = os.getenv('BIOCULTURAL_API_TOKEN')
+        if not header:
+            raise ValueError("BIOCULTURAL_API_TOKEN no está definido en el entorno")
         headers = {'X-Dataverse-key': header}
 
     # Variable para indicar si existe un archivo dwca.zip descargado para el recurso y poder procesarlo
@@ -161,6 +175,7 @@ def download_and_decompress_file(file_url, download_dir, identifier, catalogue):
             print(f"Archivo descargado: {zip_file_path}")
         except requests.exceptions.RequestException as e:
             print(f"Error al descargar el archivo: {e}")
+            return False 
 
         # Descomprimir el archivo ZIP
         try:

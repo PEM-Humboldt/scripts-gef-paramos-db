@@ -1,5 +1,9 @@
 # Autor: Diego Moreno-Vargas (github.com/damorenov)
 # Última modificación: 2025-01-15
+"""
+Script principal para procesar recursos de diferentes catálogos y actualizar la base de datos PostgreSQL.
+Incluye configuración de logging, carga de variables de entorno y manejo robusto de recursos y errores.
+"""
 
 # Importar librerías: OS para funciones de python, psycopg2 para conexión a PostgreSQL,
 # dotenv para cargar variables de entorno desde un archivo .env en la raíz del proyecto,
@@ -7,18 +11,31 @@
 # xml.etree.ElementTree para manipulación de archivos XML y csv para lectura de archivos
 # delimitados por caracteres.
 import os
+import logging
 import psycopg2
-import psycopg2.pool 
-
+import psycopg2.pool
 from dotenv import load_dotenv
+
 from utils.functions import clean_text
 from utils.catalogue_ceiba import process_ceiba
 from utils.catalogue_geonetwork import process_geonetwork
 from utils.catalogue_biocultural import process_biocultural
 
+# Configuración de logging
+log_file_path = os.getenv('LOG_FILE_PATH')
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s %(message)s',
+    handlers=[
+        logging.FileHandler(log_file_path),
+        logging.StreamHandler()
+    ]
+)
 
 def main():
-    # Cargar las variables del archivo .env que contiene las credenciales de la base de datos
+    """
+    Procesa los recursos de la base de datos según su catálogo.
+    """
     load_dotenv()
 
     # Leer las variables de entorno desde el archivo .env
@@ -35,6 +52,9 @@ def main():
     geonetwork_pass = os.getenv('GEONETWORK_PASS')
     dataverse_url = os.getenv('BIOCULTURAL_API_URL')
     biocultural_download_dir = os.getenv('BIOCULTURAL_DOWNLOAD_DIR')
+
+    if not all([database_user, database_pass, database_host, database_port, database_name]):
+        raise ValueError("Faltan variables de entorno para la base de datos")
 
     # probar la conexión a la base de datos con las variables de entorno creando un pool de conexiones para mantener
     # la conexión abierta y usarla en el resto del código
@@ -58,7 +78,7 @@ def main():
         for resource in resources:
             # La siguiente linea descompone la tupla en variables individuales
             resource_id, identifier, url, catalogue, timestamp_created, timestamp_modified, harvested = resource
-            print(f"resource_id: {resource_id}, identifier: {identifier}, url: {url}, catalogue: {catalogue}, timestamp_created: {timestamp_created}, timestamp_modified: {timestamp_modified}, harvested: {harvested}")
+            logging.info(f"resource_id: {resource_id}, identifier: {identifier}, url: {url}, catalogue: {catalogue}, timestamp_created: {timestamp_created}, timestamp_modified: {timestamp_modified}, harvested: {harvested}")
             # De acuerdo al catalogador, se llama a la función correspondiente para procesar el recurso
             if(catalogue == 'ceiba'):
                 """Llamada a la función process_ceiba para procesar el recurso de Ceiba.
@@ -101,19 +121,22 @@ def main():
                 """
                 process_biocultural(connection, cursor, dataverse_url, biocultural_download_dir, identifier, resource_id)      
             else:
-                print("El catalogador no está definido, se omite el procesamiento.")
+                logging.warning(f"El catalogador '{catalogue}' no está definido, se omite el procesamiento.")
                 continue
     except (Exception, psycopg2.Error) as error:
         # Si se presenta error en la conexión de la base de datos, se imprime en consola.
-        print(f"Error de conexión a PostgreSQL: {error}")
+        logging.error(f"Error de conexión a PostgreSQL: {error}")
     finally:
         # Se ejecuta en cualquier caso para cerrar el pool de conexión a la base de datos.
-        # Si la conexión fue exitosa, se cierra la conexión. 
-        if pool:
+        # Usamos 'locals()' para verificar si las variables fueron creadas antes de intentar cerrarlas.
+        # Esto previene errores si ocurre una excepción antes de la creación de 'cursor', 'connection' o 'pool'.
+        if 'cursor' in locals():
             cursor.close()
+        if 'connection' in locals():
             pool.putconn(connection)
+        if 'pool' in locals():
             pool.closeall()
-            print("Conexión a PostgreSQL cerrada")
+        logging.info("Conexión a PostgreSQL cerrada")
 
 if __name__ == "__main__":
     main()
